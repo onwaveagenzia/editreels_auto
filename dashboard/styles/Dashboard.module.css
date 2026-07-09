@@ -1,0 +1,492 @@
+/* dashboard/styles/Dashboard.module.css */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  color: #333;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* ============================================================================
+   HEADER
+   ============================================================================ */
+
+.header {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  margin-bottom: 30px;
+  border-left: 5px solid #667eea;
+}
+
+.headerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+}
+
+.headerStats {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.statBadge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 25px;
+  border-radius: 8px;
+  color: white;
+  font-weight: 600;
+  min-width: 120px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.statValue {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.statLabel {
+  font-size: 12px;
+  opacity: 0.9;
+  margin-top: 4px;
+}
+
+/* ============================================================================
+   TABS
+   ============================================================================ */
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 12px 24px;
+  border: none;
+  background: transparent;
+  color: #666;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.tab:hover {
+  background: #F5F5F5;
+  color: #333;
+}
+
+.tab.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+}
+
+/* ============================================================================
+   MAIN CONTENT
+   ============================================================================ */
+
+.main {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  min-height: 400px;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+  font-size: 16px;
+}
+
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+  font-size: 16px;
+}
+
+/* ============================================================================
+   JOBS LIST
+   ============================================================================ */
+
+.jobsList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+/* ============================================================================
+   JOB CARD
+   ============================================================================ */
+
+.jobCard {
+  background: #FAFAFA;
+  border: 1px solid #E0E0E0;
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.jobCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.jobHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.jobTitle {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+}
+
+.statusIcon {
+  font-size: 24px;
+  margin-top: 2px;
+}
+
+.jobTitle h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.jobMeta {
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
+}
+
+.jobStatus {
+  display: inline-block;
+  padding: 6px 12px;
+  background: #F0F0F0;
+  color: #666;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ============================================================================
+   PROGRESS BAR
+   ============================================================================ */
+
+.progressContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background: #E0E0E0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #4ECDC4 0%, #45B7D1 100%);
+  transition: width 0.3s ease;
+  border-radius: 4px;
+}
+
+.progressText {
+  font-size: 12px;
+  color: #999;
+  text-align: right;
+}
+
+/* ============================================================================
+   ERROR MESSAGE
+   ============================================================================ */
+
+.errorMessage {
+  background: #FFE5E5;
+  border-left: 3px solid #FF6B6B;
+  color: #C92A2A;
+  padding: 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  word-break: break-word;
+}
+
+/* ============================================================================
+   RESULTS
+   ============================================================================ */
+
+.results {
+  border-top: 1px solid #E0E0E0;
+  padding-top: 15px;
+}
+
+.results h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.resultsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.resultItem {
+  font-size: 12px;
+  color: #667eea;
+  padding: 6px 10px;
+  background: #F5F7FF;
+  border-radius: 4px;
+  word-break: break-word;
+}
+
+/* ============================================================================
+   JOB FOOTER (Actions)
+   ============================================================================ */
+
+.jobFooter {
+  display: flex;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #E0E0E0;
+  flex-wrap: wrap;
+}
+
+.btn {
+  flex: 1;
+  min-width: 100px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* ============================================================================
+   STATISTICS CONTAINER
+   ============================================================================ */
+
+.statsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.statCard {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.statCard h3 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.statCard p {
+  font-size: 14px;
+  margin: 10px 0;
+  line-height: 1.6;
+}
+
+.statCard strong {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.statCard ul {
+  list-style: none;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.statCard li {
+  margin: 8px 0;
+  padding-left: 20px;
+  position: relative;
+}
+
+.statCard li:before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+
+/* ============================================================================
+   RESPONSIVE
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+
+  .headerContent {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header h1 {
+    font-size: 24px;
+  }
+
+  .headerStats {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .statBadge {
+    min-width: auto;
+    flex: 1;
+    padding: 12px;
+  }
+
+  .tabs {
+    flex-direction: column;
+  }
+
+  .tab {
+    width: 100%;
+  }
+
+  .main {
+    padding: 20px;
+  }
+
+  .jobsList {
+    grid-template-columns: 1fr;
+  }
+
+  .jobCard {
+    padding: 16px;
+  }
+
+  .headerContent {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .headerStats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 10px;
+  }
+
+  .header {
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .header h1 {
+    font-size: 20px;
+  }
+
+  .headerStats {
+    grid-template-columns: 1fr;
+  }
+
+  .statBadge {
+    padding: 10px;
+  }
+
+  .statValue {
+    font-size: 20px;
+  }
+
+  .statLabel {
+    font-size: 11px;
+  }
+
+  .main {
+    padding: 15px;
+    min-height: 300px;
+  }
+
+  .jobCard {
+    padding: 12px;
+  }
+
+  .jobTitle h3 {
+    font-size: 14px;
+  }
+
+  .jobFooter {
+    gap: 8px;
+  }
+
+  .btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}

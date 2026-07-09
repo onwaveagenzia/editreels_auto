@@ -1,0 +1,343 @@
+# ONWAVE Video Skill Configuration
+# Environment: Production
+# Last Updated: 2026-07-09
+
+# ============================================================================
+# API KEYS (Use environment variables in production!)
+# ============================================================================
+
+api_keys:
+  elevenlabs:
+    key: "${ELEVENLABS_API_KEY}"
+    # Alternative: YOUR_ELEVENLABS_API_KEY
+    base_url: "https://api.elevenlabs.io/v1"
+    timeout: 30
+
+  openai:  # Optional - for advanced Whisper STT
+    key: "${OPENAI_API_KEY}"
+    model: "whisper-1"
+
+# ============================================================================
+# VIDEO PROCESSING
+# ============================================================================
+
+video:
+  # Input formats
+  input_formats:
+    - mp4
+    - mov
+    - avi
+    - mkv
+    - webm
+  
+  # Output formats
+  output_formats:
+    mp4:
+      codec_video: "libx264"
+      codec_audio: "aac"
+      bitrate_video: "8000k"
+      bitrate_audio: "128k"
+      preset: "medium"
+      
+    webm:
+      codec_video: "libvpx-vp9"
+      codec_audio: "libopus"
+      bitrate_video: "6000k"
+      bitrate_audio: "96k"
+      
+    mov:
+      codec_video: "prores"
+      codec_audio: "pcm_s16le"
+      profile: "3"
+      preset: "slow"
+  
+  # Processing constraints
+  max_resolution: "4K"  # Auto-downscale if higher
+  max_duration_minutes: 120
+  default_fps: 30
+  default_resolution: "1920x1080"
+
+# ============================================================================
+# AUDIO PROCESSING
+# ============================================================================
+
+audio:
+  # Silence detection
+  silence_detection:
+    enabled: true
+    threshold_db: -40
+    min_duration_seconds: 2.0
+    remove_by_default: true
+  
+  # Normalization
+  normalization:
+    enabled: true
+    target_lufs: -23  # Broadcast standard
+    true_peak_db: -1.5
+  
+  # Speech-to-text
+  stt:
+    engine: "whisper"  # or "google_cloud", "azure"
+    model: "base"  # tiny, base, small, medium, large
+    language: "it"  # Italian default
+    confidence_threshold: 0.8
+
+# ============================================================================
+# SUBTITLE GENERATION
+# ============================================================================
+
+subtitles:
+  # Styling
+  font:
+    family: "Arial"
+    size: 48
+    color: "#FFFFFF"
+    weight: "bold"
+  
+  # Background
+  background:
+    color: "rgba(0,0,0,0.7)"
+    padding: 10
+    border_radius: 5
+  
+  # Position & Layout
+  position: "bottom"  # top, center, bottom
+  margin_bottom: 20
+  max_width_percent: 90
+  line_height: 1.4
+  
+  # Format output
+  output_formats:
+    - "srt"
+    - "vtt"
+    - "ass"  # Advanced SubStation Alpha
+
+# ============================================================================
+# ANIMATIONS (Hyperframes)
+# ============================================================================
+
+animations:
+  # Default profile
+  default_style: "social_media"  # social_media, educational, corporate, testimonial, action
+  
+  # Intensity (0.0-1.0)
+  default_intensity: 0.8
+  
+  # Easing
+  default_easing: "ease-in-out"
+  
+  # Sync settings
+  enable_auto_sync: true
+  audio_detection_enabled: true
+  
+  # Preset animations
+  presets:
+    intro:
+      - type: "zoom_in"
+        duration: 0.5
+        intensity: 0.8
+    
+    transition:
+      - type: "fade_out"
+        duration: 0.2
+      - type: "slide_left"
+        duration: 0.3
+      - type: "fade_in"
+        duration: 0.2
+    
+    emphasis:
+      - type: "pulse"
+        duration: 0.4
+      - type: "bounce"
+        duration: 0.3
+    
+    outro:
+      - type: "zoom_out"
+        duration: 0.5
+      - type: "fade_out"
+        duration: 0.3
+
+# ============================================================================
+# VOICE PROFILES (ElevenLabs)
+# ============================================================================
+
+voices:
+  default: "professional"
+  
+  profiles:
+    professional:
+      voice_id: "21m00Tcm4TlvDq8ikWAM"  # Bella
+      stability: 0.5
+      similarity_boost: 0.75
+      description: "Neutral, professional tone for corporate content"
+      language: "en-US"
+    
+    warm:
+      voice_id: "EXAVITQu4vr4xnSDxMaL"  # Duane
+      stability: 0.4
+      similarity_boost: 0.85
+      description: "Warm, friendly tone for tutorials and storytelling"
+      language: "en-US"
+    
+    energetic:
+      voice_id: "p305z4z21i11qg30h92h"  # Andrea
+      stability: 0.6
+      similarity_boost: 0.8
+      description: "Dynamic, energetic tone for social media"
+      language: "en-US"
+    
+    deep:
+      voice_id: "onwK4e9ZLuTAKqWW03F9"  # Adam
+      stability: 0.7
+      similarity_boost: 0.7
+      description: "Deep, authoritative tone for narrations"
+      language: "en-US"
+
+# ============================================================================
+# FILE MANAGEMENT
+# ============================================================================
+
+paths:
+  # Input/output directories
+  input_dir: "./input"
+  output_dir: "./output"
+  cache_dir: "./cache"
+  temp_dir: "/tmp/onwave"
+  
+  # Keep intermediates
+  keep_intermediates: false
+  
+  # Cleanup policy
+  auto_cleanup: true
+  cleanup_after_hours: 24
+
+# ============================================================================
+# PERFORMANCE & OPTIMIZATION
+# ============================================================================
+
+performance:
+  # Parallel processing
+  max_workers: 4
+  enable_gpu_acceleration: true
+  
+  # Quality vs Speed
+  quality_preset: "high"  # fast, medium, high
+  
+  # Caching
+  enable_caching: true
+  cache_ttl_hours: 72
+
+# ============================================================================
+# LOGGING & MONITORING
+# ============================================================================
+
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "onwave_video.log"
+  max_size_mb: 50
+  backup_count: 5
+
+# ============================================================================
+# QUALITY ASSURANCE
+# ============================================================================
+
+qa:
+  # Auto-validation
+  validate_sync: true
+  validate_audio_levels: true
+  validate_subtitle_timing: true
+  
+  # Thresholds
+  sync_tolerance_ms: 100  # Max A/V sync drift
+  audio_level_tolerance_db: 3.0
+  min_subtitle_duration_ms: 500
+  max_subtitle_duration_ms: 8000
+
+# ============================================================================
+# INTEGRATIONS
+# ============================================================================
+
+integrations:
+  # Cloud storage (optional)
+  s3:
+    enabled: false
+    bucket: "onwave-videos"
+    region: "eu-west-1"
+  
+  # Analytics
+  analytics:
+    enabled: true
+    track_processing_time: true
+    track_export_formats: true
+  
+  # Webhooks (optional)
+  webhooks:
+    enabled: false
+    on_complete: "https://api.example.com/webhook/video-complete"
+    on_error: "https://api.example.com/webhook/video-error"
+
+# ============================================================================
+# BRAND SETTINGS (ONWAVE Custom)
+# ============================================================================
+
+brand:
+  name: "ONWAVE"
+  website: "https://onwave.studio"
+  
+  # Watermark (optional)
+  watermark:
+    enabled: false
+    position: "bottom-right"
+    opacity: 0.3
+    scale: 0.15
+  
+  # Color palette
+  colors:
+    primary: "#000000"
+    secondary: "#FFFFFF"
+    accent: "#FF6B6B"
+  
+  # Fonts
+  default_font: "Arial"
+  fallback_fonts:
+    - "Helvetica"
+    - "Sans-serif"
+
+# ============================================================================
+# PRESETS FOR CLIENT DELIVERY
+# ============================================================================
+
+presets:
+  social_media:
+    video:
+      resolution: "1080x1920"  # Vertical for TikTok/Reels
+      fps: 30
+    animations:
+      style: "social_media"
+      intensity: 0.95
+    
+  elearning:
+    video:
+      resolution: "1920x1080"
+      fps: 30
+    subtitles:
+      font:
+        size: 36
+        color: "#1a1a1a"
+    animations:
+      style: "educational"
+      intensity: 0.6
+  
+  corporate:
+    video:
+      resolution: "1920x1080"
+      fps: 30
+    audio:
+      normalization:
+        target_lufs: -23
+    animations:
+      style: "corporate"
+      intensity: 0.4
+    subtitles:
+      position: "top"

@@ -1,0 +1,70 @@
+{
+  "name": "onwave-video-processing",
+  "version": "1.0.0",
+  "description": "Professional video processing system for ONWAVE studio - CLI, API, Dashboard, Google Drive integration",
+  "main": "api/server.py",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:dashboard\"",
+    "dev:api": "cd api && python server.py",
+    "dev:dashboard": "cd dashboard && next dev",
+    "build": "cd dashboard && next build",
+    "start": "concurrently \"npm run start:api\" \"npm run start:dashboard\"",
+    "start:api": "cd api && python server.py",
+    "start:dashboard": "cd dashboard && next start",
+    "lint": "next lint",
+    "cli": "python scripts/cli.py",
+    "cli:interactive": "python scripts/cli.py interactive",
+    "cli:process": "python scripts/cli.py process",
+    "cli:jobs": "python scripts/cli.py jobs",
+    "cli:config": "python scripts/cli.py config",
+    "drive:setup": "python scripts/google_drive_sync.py setup",
+    "drive:watch": "python scripts/google_drive_sync.py watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "next": "^13.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^5.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-next": "^13.4.0",
+    "concurrently": "^8.0.0"
+  },
+  "python": {
+    "requirements": [
+      "flask>=2.3.0",
+      "flask-cors>=4.0.0",
+      "google-auth-oauthlib>=1.0.0",
+      "google-auth-httplib2>=0.1.1",
+      "google-api-python-client>=2.80.0",
+      "rich>=13.0.0",
+      "click>=8.0.0",
+      "requests>=2.30.0",
+      "opencv-python>=4.7.0",
+      "ffmpeg-python>=0.2.1",
+      "openai>=0.27.0",
+      "elevenlabs>=0.2.0",
+      "moviepy>=1.0.3",
+      "pydub>=0.25.1",
+      "librosa>=0.10.0",
+      "scipy>=1.10.0"
+    ]
+  },
+  "keywords": [
+    "video",
+    "processing",
+    "automation",
+    "social-media",
+    "ffmpeg",
+    "api",
+    "cli",
+    "dashboard"
+  ],
+  "author": "ONWAVE Studio",
+  "license": "MIT"
+}

@@ -1,0 +1,323 @@
+{
+  "skill": {
+    "id": "onwave-video-assistant",
+    "name": "ONWAVE Video Assistant",
+    "version": "1.0.0",
+    "description": "End-to-end video editing with automatic subtitles, synchronized animations, and AI voiceover synthesis",
+    
+    "metadata": {
+      "author": "ONWAVE Studio Creativo",
+      "website": "https://onwave.studio",
+      "created_date": "2026-07-09",
+      "last_updated": "2026-07-09",
+      "license": "MIT"
+    },
+    
+    "capabilities": {
+      "video_analysis": {
+        "detect_silences": true,
+        "detect_quality_issues": true,
+        "extract_metadata": true,
+        "estimate_cut_points": true
+      },
+      "video_editing": {
+        "remove_silences": true,
+        "cut_scenes": true,
+        "merge_clips": true,
+        "apply_effects": true,
+        "export_formats": ["mp4", "webm", "mov"]
+      },
+      "subtitle_generation": {
+        "auto_transcribe": true,
+        "sync_timing": true,
+        "format_export": ["srt", "vtt", "ass"],
+        "styling": {
+          "custom_font": true,
+          "custom_colors": true,
+          "position_control": true
+        }
+      },
+      "voiceover_synthesis": {
+        "api": "elevenlabs",
+        "voice_profiles": 4,
+        "languages": "multi",
+        "quality": "high"
+      },
+      "animations": {
+        "engine": "hyperframes",
+        "animation_types": 15,
+        "presets": 5,
+        "auto_sync": true
+      }
+    },
+    
+    "dependencies": {
+      "python": "3.9+",
+      "system": [
+        "ffmpeg",
+        "ffprobe"
+      ],
+      "python_packages": [
+        "moviepy",
+        "pydub",
+        "librosa",
+        "openai-whisper",
+        "pysrt",
+        "requests",
+        "pyyaml"
+      ]
+    },
+    
+    "api_keys_required": [
+      {
+        "name": "ELEVENLABS_API_KEY",
+        "service": "ElevenLabs",
+        "url": "https://elevenlabs.io",
+        "description": "For AI voice synthesis and voiceover generation"
+      }
+    ],
+    
+    "api_keys_optional": [
+      {
+        "name": "OPENAI_API_KEY",
+        "service": "OpenAI",
+        "url": "https://openai.com",
+        "description": "For advanced Whisper STT (uses open-source model by default)"
+      }
+    ],
+    
+    "modules": {
+      "core": [
+        "scripts/video-processor.py",
+        "scripts/elevenlabs-sync.py",
+        "scripts/animations.py"
+      ],
+      "utils": [
+        "scripts/utils/ffmpeg_wrapper.py",
+        "scripts/utils/audio_analyzer.py",
+        "scripts/utils/subtitle_formatter.py"
+      ],
+      "references": [
+        "references/elevenlabs-integration.md",
+        "references/hyperframes-animations.md",
+        "references/voice-profiles.md",
+        "references/troubleshooting.md"
+      ],
+      "examples": [
+        "examples/social_media_workflow.md",
+        "examples/corporate_video.md",
+        "examples/tutorial_video.md"
+      ]
+    },
+    
+    "commands": [
+      {
+        "name": "analyze-video",
+        "description": "Analyze video for quality, silences, and optimization opportunities",
+        "entry": "python scripts/video-processor.py <video_path>",
+        "args": [
+          {
+            "name": "video_path",
+            "type": "string",
+            "required": true,
+            "description": "Path to input video file"
+          }
+        ]
+      },
+      {
+        "name": "process-video",
+        "description": "Complete workflow: analyze → cut silences → generate subtitles → export",
+        "entry": "python scripts/video-processor.py <video_path>",
+        "args": [
+          {
+            "name": "--no-silence",
+            "type": "flag",
+            "description": "Skip silence removal"
+          },
+          {
+            "name": "--no-subtitles",
+            "type": "flag",
+            "description": "Skip subtitle generation"
+          }
+        ]
+      },
+      {
+        "name": "generate-voiceover",
+        "description": "Create AI voiceover from script and sync with video",
+        "entry": "python scripts/elevenlabs-sync.py <video_path>",
+        "args": [
+          {
+            "name": "--script",
+            "type": "string",
+            "description": "Path to script file"
+          },
+          {
+            "name": "--text",
+            "type": "string",
+            "description": "Direct text for voiceover"
+          },
+          {
+            "name": "--voice",
+            "type": "enum",
+            "values": ["professional", "warm", "energetic", "deep"],
+            "default": "professional",
+            "description": "Voice profile to use"
+          },
+          {
+            "name": "--keep-original",
+            "type": "flag",
+            "description": "Mix voiceover with original audio instead of replacing"
+          }
+        ]
+      },
+      {
+        "name": "generate-animations",
+        "description": "Auto-generate Hyperframes animations from video content",
+        "entry": "python scripts/animations.py",
+        "args": [
+          {
+            "name": "--style",
+            "type": "enum",
+            "values": ["social_media", "educational", "corporate", "testimonial", "action"],
+            "default": "social_media",
+            "description": "Animation style preset"
+          },
+          {
+            "name": "--intensity",
+            "type": "float",
+            "min": 0.0,
+            "max": 1.0,
+            "default": 0.8,
+            "description": "Animation intensity level"
+          }
+        ]
+      },
+      {
+        "name": "list-voices",
+        "description": "Show available voice profiles",
+        "entry": "python scripts/elevenlabs-sync.py --list-voices"
+      }
+    ],
+    
+    "use_cases": [
+      {
+        "category": "Social Media",
+        "examples": [
+          "TikTok/Reels video creation with dynamic animations",
+          "YouTube Shorts with auto-generated captions",
+          "Instagram Story compilation with voiceover"
+        ]
+      },
+      {
+        "category": "Educational",
+        "examples": [
+          "Online course video with clear subtitles",
+          "Tutorial screencast with AI narration",
+          "Webinar recording with auto-captions"
+        ]
+      },
+      {
+        "category": "Corporate",
+        "examples": [
+          "Corporate video with professional voiceover",
+          "Product demo with synchronized animations",
+          "Testimonial compilation with consistent audio"
+        ]
+      },
+      {
+        "category": "Content Creators",
+        "examples": [
+          "Podcast video creation from audio",
+          "Interview video polishing and captioning",
+          "Vlog automatic subtitle generation"
+        ]
+      }
+    ],
+    
+    "settings": {
+      "config_file": "config.yaml",
+      "env_vars": [
+        "ELEVENLABS_API_KEY",
+        "OPENAI_API_KEY",
+        "LOG_LEVEL",
+        "TEMP_DIR"
+      ],
+      "output_locations": [
+        "./output",
+        "./cache",
+        "/tmp/onwave"
+      ]
+    },
+    
+    "performance": {
+      "max_video_duration": "2 hours",
+      "max_resolution": "4K",
+      "processing_speed": "Real-time or faster (varies by hardware)",
+      "parallel_processing": true,
+      "gpu_acceleration": true,
+      "estimated_times": {
+        "10min_1080p": "2-5 minutes",
+        "10min_4k": "8-15 minutes",
+        "voiceover_generation": "API-dependent"
+      }
+    },
+    
+    "quality_metrics": {
+      "subtitle_accuracy": "95%+ (Whisper model)",
+      "audio_sync_tolerance": "100ms",
+      "animation_frame_sync": "Millisecond-precise",
+      "export_quality": "Broadcast-standard"
+    },
+    
+    "integrations": {
+      "apis": [
+        {
+          "name": "ElevenLabs",
+          "type": "Voice Synthesis",
+          "endpoint": "https://api.elevenlabs.io/v1"
+        },
+        {
+          "name": "OpenAI Whisper",
+          "type": "Speech-to-Text",
+          "mode": "Local or API"
+        },
+        {
+          "name": "Hyperframes",
+          "type": "Animation Engine",
+          "output_format": "JSON"
+        }
+      ],
+      "cloud_storage": [
+        "AWS S3",
+        "Google Drive",
+        "Dropbox"
+      ]
+    },
+    
+    "pricing": {
+      "skill": "Free (Open Source)",
+      "elevenlabs_credits": "Pay-as-you-go (characters generated)",
+      "openai_api": "Optional, pay-as-you-go"
+    },
+    
+    "support": {
+      "documentation": "README.md + references/ folder",
+      "examples": "examples/ folder",
+      "troubleshooting": "references/troubleshooting.md",
+      "contact": "tech@onwave.studio"
+    },
+    
+    "tags": [
+      "video-editing",
+      "subtitles",
+      "voiceover",
+      "ai-synthesis",
+      "animations",
+      "content-creation",
+      "broadcast",
+      "social-media",
+      "elevenlabs",
+      "hyperframes"
+    ]
+  }
+}

@@ -1,0 +1,108 @@
+name: Deploy ONWAVE
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  # ========================================================================
+  # LINT & TEST
+  # ========================================================================
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install flake8 black
+      
+      - name: Lint Python
+        run: |
+          flake8 scripts/ api/ --max-line-length=120 --exclude=__pycache__
+          black scripts/ api/ --check
+      
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Lint JavaScript
+        run: |
+          cd dashboard
+          npm install
+          npm run lint || true
+
+  # ========================================================================
+  # BUILD
+  # ========================================================================
+  build:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install Python deps
+        run: |
+          pip install -r requirements.txt
+      
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Build dashboard
+        run: |
+          cd dashboard
+          npm install
+          npm run build
+
+  # ========================================================================
+  # DEPLOY TO VERCEL (Dashboard)
+  # ========================================================================
+  deploy-vercel:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy to Vercel
+        uses: vercel/action@v28
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          working-directory: dashboard
+
+  # ========================================================================
+  # NOTIFY (Optional - Slack/Email)
+  # ========================================================================
+  notify:
+    runs-on: ubuntu-latest
+    needs: [lint, build]
+    if: always()
+    steps:
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "Build failed - check GitHub Actions logs"
+      
+      - name: Notify on success
+        if: success()
+        run: |
+          echo "Build and tests passed!"

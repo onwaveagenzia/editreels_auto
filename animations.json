@@ -1,0 +1,91 @@
+{
+  "version": "1.0",
+  "project": {
+    "name": "ONWAVE Video",
+    "fps": 30,
+    "duration": 4.6
+  },
+  "layers": [],
+  "timeline": [
+    {
+      "id": "subtitle_0_fade_in",
+      "type": "fade_in",
+      "target": "subtitle_0",
+      "startTime": 0,
+      "duration": 0.2,
+      "easing": "ease-in-out",
+      "intensity": 0.7200000000000001,
+      "properties": {}
+    },
+    {
+      "id": "subtitle_0_zoom_in",
+      "type": "zoom_in",
+      "target": "subtitle_0",
+      "startTime": 0,
+      "duration": 0.6,
+      "easing": "ease-in-out",
+      "intensity": 0.9,
+      "properties": {}
+    },
+    {
+      "id": "subtitle_0_fade_out",
+      "type": "fade_out",
+      "target": "subtitle_0",
+      "startTime": 1.8,
+      "duration": 0.2,
+      "easing": "ease-in-out",
+      "intensity": 0.54,
+      "properties": {}
+    },
+    {
+      "id": "subtitle_1_fade_in",
+      "type": "fade_in",
+      "target": "subtitle_1",
+      "startTime": 2,
+      "duration": 0.2,
+      "easing": "ease-in-out",
+      "intensity": 0.7200000000000001,
+      "properties": {}
+    },
+    {
+      "id": "subtitle_1_slide_left",
+      "type": "slide_left",
+      "target": "subtitle_1",
+      "startTime": 2,
+      "duration": 0.6,
+      "easing": "ease-in-out",
+      "intensity": 0.9,
+      "properties": {}
+    },
+    {
+      "id": "subtitle_1_fade_out",
+      "type": "fade_out",
+      "target": "subtitle_1",
+      "startTime": 3.8,
+      "duration": 0.2,
+      "easing": "ease-in-out",
+      "intensity": 0.54,
+      "properties": {}
+    },
+    {
+      "id": "subtitle_2_fade_in",
+      "type": "fade_in",
+      "target": "subtitle_2",
+      "startTime": 4,
+      "duration": 0.2,
+      "easing": "ease-in-out",
+      "intensity": 0.7200000000000001,
+      "properties": {}
+    },
+    {
+      "id": "subtitle_2_emphasis",
+      "type": "emphasis",
+      "target": "subtitle_2",
+      "startTime": 4,
+      "duration": 0.6,
+      "easing": "ease-in-out",
+      "intensity": 0.9,
+      "properties": {}
+    }
+  ]
+}
