@@ -278,6 +278,45 @@ worker.start()
 # API ROUTES
 # ============================================================================
 
+@app.route('/api/upload', methods=['POST'])
+def upload_video():
+    """
+    Carica un file video sul server, per poi poterlo processare
+    (job normale o /api/transcribe).
+
+    Form-data: file=<video binario>
+
+    Returns: { "video_path": "/tmp/onwave_uploads/xxx.mp4", "size_mb": 12.3 }
+    """
+    if 'file' not in request.files:
+        return jsonify({'error': 'Nessun file inviato (campo "file" mancante)'}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'Nome file vuoto'}), 400
+
+    valid_extensions = {'.mp4', '.mov', '.avi', '.mkv', '.webm', '.m4v'}
+    ext = Path(file.filename).suffix.lower()
+    if ext not in valid_extensions:
+        return jsonify({'error': f'Formato non supportato: {ext}'}), 400
+
+    filename = secure_filename(file.filename)
+    # Prefisso timestamp per evitare collisioni tra upload diversi
+    unique_name = f"{int(datetime.now().timestamp())}_{filename}"
+    save_path = UPLOAD_FOLDER / unique_name
+
+    file.save(str(save_path))
+    size_mb = round(save_path.stat().st_size / (1024 * 1024), 2)
+
+    logger.info(f"📤 Upload ricevuto: {unique_name} ({size_mb} MB)")
+
+    return jsonify({
+        'video_path': str(save_path),
+        'filename': unique_name,
+        'size_mb': size_mb
+    }), 201
+
+
 @app.route('/api/health', methods=['GET'])
 def health():
     """Health check"""
