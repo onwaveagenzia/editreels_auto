@@ -411,6 +411,46 @@ def get_stats():
     """Statistiche complessive"""
     return jsonify(job_store.get_stats())
 
+@app.route('/api/transcribe', methods=['POST'])
+def transcribe_endpoint():
+    """
+    Trascrive un video e genera sottotitoli + emoji contestuali.
+    Body JSON: { "video_path": "...", "output_path": "...", "language": "it",
+                 "burn_subtitles": true, "add_emojis": true, "model_size": "small" }
+
+    Nota: questa chiamata è SINCRONA e può richiedere da 10s a qualche minuto
+    a seconda della durata del video e della dimensione del modello scelto.
+    Per video lunghi, usare via job queue invece di chiamata diretta.
+    """
+    data = request.get_json()
+
+    video_path = data.get('video_path')
+    if not video_path or not Path(video_path).exists():
+        return jsonify({'error': 'video_path mancante o file non trovato'}), 400
+
+    output_path = data.get('output_path') or str(
+        Path(video_path).with_stem(Path(video_path).stem + '_captioned')
+    )
+
+    try:
+        from subtitle_emoji_processor import add_subtitles_and_emojis
+
+        result = add_subtitles_and_emojis(
+            input_video=video_path,
+            output_video=output_path,
+            model_size=data.get('model_size', 'small'),
+            language=data.get('language', 'it'),
+            burn_subtitles=data.get('burn_subtitles', True),
+            add_emojis=data.get('add_emojis', True)
+        )
+
+        return jsonify({'status': 'completed', **result}), 200
+
+    except Exception as e:
+        logger.error(f"Errore trascrizione: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/api/presets', methods=['GET'])
 def get_presets():
     """Elenca preset disponibili"""
