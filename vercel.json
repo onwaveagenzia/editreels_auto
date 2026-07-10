@@ -1,14 +1,15 @@
 {
-  "name": "onwave-dashboard",
-  "version": 2,
-  "env": {
-    "NEXT_PUBLIC_API_URL": {
-      "description": "Backend API URL (es: https://api.onwave.com)",
-      "required": true
-    }
-  },
-  "buildCommand": "cd dashboard && npm install && npm run build",
-  "outputDirectory": "dashboard/.next",
   "framework": "nextjs",
-  "regions": ["fra1"]
+  "installCommand": "cd dashboard && npm install",
+  "buildCommand": "cd dashboard && npm run build",
+  "outputDirectory": "dashboard/.next",
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" }
+      ]
+    }
+  ]
 }
