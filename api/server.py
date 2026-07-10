@@ -181,78 +181,60 @@ class ProcessingWorker(threading.Thread):
                 started=datetime.now().isoformat()
             )
             
-            # Call video-processor.py script
             video_path = job['video_path']
             preset = job['preset']
             output_dir = job['output_dir']
             options = job.get('options', {})
-            
-            cmd = [
-                'python', 'scripts/video-processor.py',
-                video_path,
-                '--preset', preset,
-                '--output', output_dir,
-                '--job-id', job_id
-            ]
-            
-            if not options.get('add_subtitles'):
-                cmd.append('--no-subtitles')
-            if not options.get('remove_silence'):
-                cmd.append('--no-silence')
-            
-            # Run with progress tracking
-            process = subprocess.Popen(
-                cmd,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True
+
+            Path(output_dir).mkdir(parents=True, exist_ok=True)
+            output_filename = f"{Path(video_path).stem}_{preset}.mp4"
+            output_path = str(Path(output_dir) / output_filename)
+
+            from video_processor import process_video
+
+            self.job_store.update_job(job_id, progress=10)
+
+            result = process_video(
+                input_path=video_path,
+                output_path=output_path,
+                preset_name=preset,
+                remove_silence=options.get('remove_silence', True)
             )
-            
-            # Monitor progress
-            for line in process.stdout:
-                if 'progress' in line.lower():
-                    logger.info(f"[{job_id}] {line.strip()}")
-                    # Parse progress percentage
-                    try:
-                        progress = int(line.split('progress:')[1].split('%')[0])
-                        self.job_store.update_job(job_id, progress=progress)
-                    except:
-                        pass
-            
-            stdout, stderr = process.communicate()
-            
-            if process.returncode == 0:
-                # Success
-                logger.info(f"✓ Job completato: {job_id}")
-                
-                # Collect output files
-                output_path = Path(output_dir)
-                result_files = list(output_path.glob(f'{Path(video_path).stem}*'))
-                
-                self.job_store.update_job(
-                    job_id,
-                    status='completed',
-                    progress=100,
-                    completed=datetime.now().isoformat(),
-                    results=[str(f) for f in result_files]
-                )
-                
-                # Auto-upload to Google Drive if enabled
-                if options.get('upload_to_drive'):
-                    self._upload_to_drive(job_id, result_files)
-            
-            else:
-                # Error
-                error_msg = stderr or "Unknown error"
-                logger.error(f"✗ Job fallito: {job_id}\n{error_msg}")
-                
-                self.job_store.update_job(
-                    job_id,
-                    status='error',
-                    completed=datetime.now().isoformat(),
-                    error=error_msg[:500]
-                )
-        
+
+            self.job_store.update_job(job_id, progress=80)
+
+            result_files = [output_path]
+
+            # Sottotitoli + emoji, se richiesti (usa il modulo Whisper già pronto)
+            if options.get('add_subtitles') or options.get('add_emojis'):
+                try:
+                    from subtitle_emoji_processor import add_subtitles_and_emojis
+                    captioned_path = str(Path(output_dir) / f"{Path(video_path).stem}_{preset}_captioned.mp4")
+                    caption_result = add_subtitles_and_emojis(
+                        input_video=output_path,
+                        output_video=captioned_path,
+                        burn_subtitles=options.get('add_subtitles', True),
+                        add_emojis=options.get('add_emojis', True)
+                    )
+                    result_files.append(captioned_path)
+                    if caption_result.get('srt_path'):
+                        result_files.append(caption_result['srt_path'])
+                except Exception as e:
+                    logger.warning(f"⚠️  Sottotitoli/emoji falliti (video base comunque pronto): {e}")
+
+            logger.info(f"✓ Job completato: {job_id}")
+
+            self.job_store.update_job(
+                job_id,
+                status='completed',
+                progress=100,
+                completed=datetime.now().isoformat(),
+                results=result_files
+            )
+
+            if options.get('upload_to_drive'):
+                self._upload_to_drive(job_id, [Path(f) for f in result_files])
+
         except Exception as e:
             logger.error(f"Exception in job {job_id}: {e}")
             self.job_store.update_job(
@@ -262,10 +244,17 @@ class ProcessingWorker(threading.Thread):
             )
     
     def _upload_to_drive(self, job_id: str, files: List[Path]):
-        """Auto-upload a Google Drive"""
+        """Auto-upload a Google Drive (richiede GOOGLE_DRIVE_OUTPUT_FOLDER_ID configurata)"""
+        output_folder_id = os.environ.get("GOOGLE_DRIVE_OUTPUT_FOLDER_ID")
+        if not output_folder_id:
+            logger.warning("Drive upload richiesto ma GOOGLE_DRIVE_OUTPUT_FOLDER_ID non configurata")
+            return
         try:
+            from drive_watcher import upload_file
             logger.info(f"📤 Caricando risultati su Drive: {job_id}")
-            # TODO: implementa con google_drive_sync.py
+            for f in files:
+                if f.exists():
+                    upload_file(str(f), output_folder_id)
             logger.info(f"✓ Upload completato")
         except Exception as e:
             logger.warning(f"Drive upload fallito: {e}")
@@ -273,6 +262,44 @@ class ProcessingWorker(threading.Thread):
 # Avvia worker thread
 worker = ProcessingWorker(job_store, job_queue)
 worker.start()
+
+# ============================================================================
+# GOOGLE DRIVE WATCHER (opzionale, si attiva solo se configurato)
+# ============================================================================
+
+def _drive_process_callback(input_path: str, output_path: str, preset: str):
+    """Callback usata dal watcher: elabora un video scaricato da Drive"""
+    from video_processor import process_video
+    process_video(input_path, output_path, preset_name=preset)
+
+    add_subtitles = os.environ.get("GOOGLE_DRIVE_ADD_SUBTITLES", "true").lower() == "true"
+    if add_subtitles:
+        try:
+            from subtitle_emoji_processor import add_subtitles_and_emojis
+            captioned = output_path.replace('.mp4', '_captioned.mp4')
+            add_subtitles_and_emojis(output_path, captioned)
+        except Exception as e:
+            logger.warning(f"Sottotitoli Drive falliti: {e}")
+
+_drive_input_folder = os.environ.get("GOOGLE_DRIVE_INPUT_FOLDER_ID")
+_drive_output_folder = os.environ.get("GOOGLE_DRIVE_OUTPUT_FOLDER_ID")
+
+if _drive_input_folder and _drive_output_folder:
+    from drive_watcher import start_watcher_thread
+    _drive_preset = os.environ.get("GOOGLE_DRIVE_PRESET", "social_media")
+    _drive_interval = int(os.environ.get("GOOGLE_DRIVE_POLL_INTERVAL", "60"))
+
+    start_watcher_thread(
+        input_folder_id=_drive_input_folder,
+        output_folder_id=_drive_output_folder,
+        upload_dir=UPLOAD_FOLDER,
+        process_callback=_drive_process_callback,
+        preset=_drive_preset,
+        poll_interval=_drive_interval
+    )
+    logger.info(f"☁️  Google Drive Watcher attivo (poll ogni {_drive_interval}s, preset: {_drive_preset})")
+else:
+    logger.info("☁️  Google Drive Watcher non configurato (variabili d'ambiente mancanti)")
 
 # ============================================================================
 # API ROUTES
